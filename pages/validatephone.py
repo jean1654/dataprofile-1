@@ -215,10 +215,10 @@ try:
 
 except Exception as e:
 
-    st.error(f"⚠️ Please enter the fieldname to be used for validation.")
+    st.error(f"⚠️ Please enter the Field Name to be used for validation.")
         
     # Text Box to copy and paste list of phone numbers
-    field_name = st.text_input('Specify Field Name to be renamed as phone_number (if different):')
+    field_name = st.text_input()
 
     if field_name:
         if field_name in df.columns:
