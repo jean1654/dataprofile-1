@@ -17,7 +17,7 @@ st.title("Validate Phone Numbers")
 
 st.markdown(""" ### 🚀 Getting Started
 1. **Select the region** you want to validate against.  
-2. **Enter phone numbers manually** or **upload one or more CSV files** for validation.
+2. **Enter phone numbers manually** or **upload one or more CSV files** for validation. (Choose only 1 at a time.)
 """)
 
 # Function: Normalize phone numbers to a standard format
@@ -70,8 +70,7 @@ def normalize_visualize(final_df):
         label="📥 Download CSV",
         data=csv,
         file_name='output_data.csv',
-        mime='text/csv',
-        key='text_download'
+        mime='text/csv'
     )
 
     st.header("Valid vs Invalid Status Visualization")
