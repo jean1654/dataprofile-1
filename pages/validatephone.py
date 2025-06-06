@@ -162,7 +162,7 @@ try:
             st.dataframe(final_df.head(10), use_container_width=False)
 
         # Try to access 'phone' column
-        if 'phone_number' not in df.columns:
+        if 'phone_number' not in final_df.columns:
             raise ValueError("'phone_number' column not found")
         else:
             # Normalize each phone number and replace value in the column
@@ -214,18 +214,15 @@ try:
                 st.pyplot(fig)
 
 except Exception as e:
-
-    # st.error(f"⚠️ Please enter the Field Name to be used for validation.")
         
     # Text Box to copy and paste list of phone numbers
     field_name = st.text_input('Specify Field Name to be renamed as phone_number:')
 
     if field_name:
-        if field_name in df.columns:
+        if field_name in final_df.columns:
             # Rename column name to phone_numbers
             final_df.rename(columns={field_name: 'phone_number'}, inplace=True)
             st.success(f"✅ Column '{field_name}' renamed to 'phone_number'.")
-            st.dataframe(df)
             
             # Normalize each phone number and replace value in the column
             final_df['normalized_phone_number'] = [normalize_phone_number(num) for num in final_df['phone_number']]
