@@ -166,13 +166,22 @@ try:
             raise ValueError("'phone_number' column not found")
 
 except Exception as e:
+
     st.error(f"⚠️ Please enter the fieldname to be used for validation.")
         
     # Text Box to copy and paste list of phone numbers
     field_name = st.text_input('Specify Field Name to be renamed as phone_number (if different):')
 
+    if field_name:
+        if field_name in df.columns:
+            final_df.rename(columns={field_name: 'phone_number'}, inplace=True)
+            st.success(f"✅ Column '{field_name}' renamed to 'phone_number'.")
+            st.dataframe(df)
+        else:
+            st.warning(f"⚠️ Column '{field_name}' not found in the file.")
+
     # Rename column name to phone_numbers
-    final_df = final_df.rename(columns={field_name: 'phone_number'})
+    # final_df = final_df.rename(columns={field_name: 'phone_number'})
 
     # Normalize each phone number and replace value in the column
     final_df['normalized_phone_number'] = [normalize_phone_number(num) for num in final_df['phone_number']]
