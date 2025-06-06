@@ -163,7 +163,7 @@ try:
             st.dataframe(final_df.head(10), use_container_width=False)
 
         # Try to access 'phone' column
-        if 'phone_number' not in final_df.columns:
+        if 'phone_number' not in df.columns:
             raise ValueError("'phone_number' column not found")
         else:
             # Normalize each phone number and replace value in the column
