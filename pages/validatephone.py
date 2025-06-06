@@ -101,7 +101,8 @@ if field_name:
         label="📥 Download CSV",
         data=csv,
         file_name='output_data.csv',
-        mime='text/csv'
+        mime='text/csv',
+        key='text_download'
     )
 
     st.header("Valid vs Invalid Status Visualization")
@@ -181,7 +182,8 @@ try:
                 label="📥 Download CSV",
                 data=csv,
                 file_name='output_data.csv',
-                mime='text/csv'
+                mime='text/csv',
+                key='fileupload1_download'
             )
 
             st.header("Valid vs Invalid Status Visualization")
@@ -240,7 +242,8 @@ except Exception as e:
                 label="📥 Download CSV",
                 data=csv,
                 file_name='output_data.csv',
-                mime='text/csv'
+                mime='text/csv',
+                key='fileupload2_download'
             )
 
             st.header("Valid vs Invalid Status Visualization")
