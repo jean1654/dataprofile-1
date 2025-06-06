@@ -136,14 +136,15 @@ if field_name:
 st.markdown(""" ### 📂 CSV Upload """)
 st.write('Note: You can upload multi-part datasets, but ensure all parts use the same schema to merge them correctly.')
 
+# File uploader (allowing multiple files to be uploaded)
+uploaded_files = st.file_uploader("Upload CSV files for Validation", type=["csv"], accept_multiple_files=True)
+
 try:
 
-    # File uploader (allowing multiple files to be uploaded)
-    uploaded_files = st.file_uploader("Upload CSV files for Validation", type=["csv"], accept_multiple_files=True)
-
-    if uploaded_files is not None:
+    if uploaded_files:
         dfs = []
         for uploaded_file in uploaded_files:
+
             # st.write(f"Reading file: {uploaded_file.name}")
             df = pd.read_csv(uploaded_file, dtype=str, keep_default_na=False)
             dfs.append(df)
