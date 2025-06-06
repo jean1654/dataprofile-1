@@ -93,6 +93,17 @@ if field_name:
     final_df['valid'] = [validate_phone_number(num, default_region=selected_code) for num in final_df['normalized_phone_number']]
     final_df
 
+    # Convert DataFrame to CSV
+    csv = final_df.to_csv(index=False).encode('utf-8')
+
+    # Download button
+    st.download_button(
+        label="📥 Download CSV",
+        data=csv,
+        file_name='output_data.csv',
+        mime='text/csv'
+    )
+
     st.header("Valid vs Invalid Status Visualization")
 
     # Value counts
@@ -160,6 +171,17 @@ if uploaded_files:
     st.text('Normalized and Validated Records (De-dup)')
     final_df['valid'] = [validate_phone_number(num, default_region=selected_code) for num in final_df['normalized_phone_number']]
     final_df
+
+    # Convert DataFrame to CSV
+    csv = final_df.to_csv(index=False).encode('utf-8')
+
+    # Download button
+    st.download_button(
+        label="📥 Download CSV",
+        data=csv,
+        file_name='output_data.csv',
+        mime='text/csv'
+    )
 
     st.header("Valid vs Invalid Status Visualization")
 
