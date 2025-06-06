@@ -164,6 +164,54 @@ try:
         # Try to access 'phone' column
         if 'phone_number' not in df.columns:
             raise ValueError("'phone_number' column not found")
+        else:
+            # Normalize each phone number and replace value in the column
+            final_df['normalized_phone_number'] = [normalize_phone_number(num) for num in final_df['phone_number']]
+
+            #  Validate phone number using phonenumbers library
+            st.text('Normalized and Validated Records (De-dup)')
+            final_df['valid'] = [validate_phone_number(num, default_region=selected_code) for num in final_df['normalized_phone_number']]
+            st.dataframe(final_df)
+
+            # Convert DataFrame to CSV
+            csv = final_df.to_csv(index=False).encode('utf-8')
+
+            # Download button
+            st.download_button(
+                label="📥 Download CSV",
+                data=csv,
+                file_name='output_data.csv',
+                mime='text/csv'
+            )
+
+            st.header("Valid vs Invalid Status Visualization")
+
+            # Value counts
+            value_counts = final_df['valid'].value_counts(dropna=False)
+            labels = value_counts.index
+            sizes = value_counts.values
+            total = sum(sizes)
+
+            # Pie chart
+            fig, ax = plt.subplots(figsize=(3, 3))
+            colors = ['green' if val == 'valid' else 'red' for val in labels]
+            ax.pie(
+                sizes,
+                labels=labels,
+                autopct=make_autopct(sizes),
+                startangle=90,
+                colors=colors,
+                textprops={'fontsize': 8})
+
+            # Equal aspect ratio ensures pie is circular
+            ax.axis('equal')
+
+            plt.tight_layout()  # Trim whitespace
+
+            # Layout in narrow column
+            col1, col2, _ = st.columns([2, 1, 1])  # Left-aligned smaller box
+            with col1:
+                st.pyplot(fig)
 
 except Exception as e:
 
@@ -174,59 +222,58 @@ except Exception as e:
 
     if field_name:
         if field_name in df.columns:
+            # Rename column name to phone_numbers
             final_df.rename(columns={field_name: 'phone_number'}, inplace=True)
             st.success(f"✅ Column '{field_name}' renamed to 'phone_number'.")
             st.dataframe(df)
+            
+            # Normalize each phone number and replace value in the column
+            final_df['normalized_phone_number'] = [normalize_phone_number(num) for num in final_df['phone_number']]
+
+            #  Validate phone number using phonenumbers library
+            st.text('Normalized and Validated Records (De-dup)')
+            final_df['valid'] = [validate_phone_number(num, default_region=selected_code) for num in final_df['normalized_phone_number']]
+            st.dataframe(final_df)
+
+            # Convert DataFrame to CSV
+            csv = final_df.to_csv(index=False).encode('utf-8')
+
+            # Download button
+            st.download_button(
+                label="📥 Download CSV",
+                data=csv,
+                file_name='output_data.csv',
+                mime='text/csv'
+            )
+
+            st.header("Valid vs Invalid Status Visualization")
+
+            # Value counts
+            value_counts = final_df['valid'].value_counts(dropna=False)
+            labels = value_counts.index
+            sizes = value_counts.values
+            total = sum(sizes)
+
+            # Pie chart
+            fig, ax = plt.subplots(figsize=(3, 3))
+            colors = ['green' if val == 'valid' else 'red' for val in labels]
+            ax.pie(
+                sizes,
+                labels=labels,
+                autopct=make_autopct(sizes),
+                startangle=90,
+                colors=colors,
+                textprops={'fontsize': 8})
+
+            # Equal aspect ratio ensures pie is circular
+            ax.axis('equal')
+
+            plt.tight_layout()  # Trim whitespace
+
+            # Layout in narrow column
+            col1, col2, _ = st.columns([2, 1, 1])  # Left-aligned smaller box
+            with col1:
+                st.pyplot(fig)
+            
         else:
             st.warning(f"⚠️ Column '{field_name}' not found in the file.")
-
-    # Rename column name to phone_numbers
-    # final_df = final_df.rename(columns={field_name: 'phone_number'})
-
-    # Normalize each phone number and replace value in the column
-    final_df['normalized_phone_number'] = [normalize_phone_number(num) for num in final_df['phone_number']]
-
-    #  Validate phone number using phonenumbers library
-    st.text('Normalized and Validated Records (De-dup)')
-    final_df['valid'] = [validate_phone_number(num, default_region=selected_code) for num in final_df['normalized_phone_number']]
-    st.dataframe(final_df)
-
-    # Convert DataFrame to CSV
-    csv = final_df.to_csv(index=False).encode('utf-8')
-
-    # Download button
-    st.download_button(
-        label="📥 Download CSV",
-        data=csv,
-        file_name='output_data.csv',
-        mime='text/csv'
-    )
-
-    st.header("Valid vs Invalid Status Visualization")
-
-    # Value counts
-    value_counts = final_df['valid'].value_counts(dropna=False)
-    labels = value_counts.index
-    sizes = value_counts.values
-    total = sum(sizes)
-
-    # Pie chart
-    fig, ax = plt.subplots(figsize=(3, 3))
-    colors = ['green' if val == 'valid' else 'red' for val in labels]
-    ax.pie(
-        sizes,
-        labels=labels,
-        autopct=make_autopct(sizes),
-        startangle=90,
-        colors=colors,
-        textprops={'fontsize': 8})
-
-    # Equal aspect ratio ensures pie is circular
-    ax.axis('equal')
-
-    plt.tight_layout()  # Trim whitespace
-
-    # Layout in narrow column
-    col1, col2, _ = st.columns([2, 1, 1])  # Left-aligned smaller box
-    with col1:
-        st.pyplot(fig)
