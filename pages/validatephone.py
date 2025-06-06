@@ -136,78 +136,87 @@ if field_name:
 st.markdown(""" ### 📂 CSV Upload """)
 st.write('Note: You can upload multi-part datasets, but ensure all parts use the same schema to merge them correctly.')
 
-# File uploader (allowing multiple files to be uploaded)
-uploaded_files = st.file_uploader("Upload CSV files for Validation", type=["csv"], accept_multiple_files=True)
+try:
 
-if uploaded_files:
-    dfs = []
-    for uploaded_file in uploaded_files:
-        # st.write(f"Reading file: {uploaded_file.name}")
-        df = pd.read_csv(uploaded_file, dtype=str, keep_default_na=False)
-        dfs.append(df)
+    # File uploader (allowing multiple files to be uploaded)
+    uploaded_files = st.file_uploader("Upload CSV files for Validation", type=["csv"], accept_multiple_files=True)
 
-    # Merge all DataFrames
-    final_df = pd.concat(dfs, ignore_index=True)
+    if uploaded_files is not None:
+        dfs = []
+        for uploaded_file in uploaded_files:
+            # st.write(f"Reading file: {uploaded_file.name}")
+            df = pd.read_csv(uploaded_file, dtype=str, keep_default_na=False)
+            dfs.append(df)
 
-    # Remove duplicated records
-    final_df = final_df.drop_duplicates()
+        # Merge all DataFrames
+        final_df = pd.concat(dfs, ignore_index=True)
 
-    # Create a narrow layout using columns
-    col1, col2, _ = st.columns([3, 2, 1])  # Adjust ratios as needed
-    with col1:
-        st.write("📋 Preview of Uploaded File(s) (De-dup)")
-        st.dataframe(final_df.head(10), use_container_width=False)
+        # Remove duplicated records
+        final_df = final_df.drop_duplicates()
 
-    # Text Box to copy and paste list of phone numbers
-    field_name = st.text_input('Specify Field Name to be renamed as phone_number (if different):')
+        # Create a narrow layout using columns
+        col1, col2, _ = st.columns([3, 2, 1])  # Adjust ratios as needed
+        with col1:
+            st.write("📋 Preview of Uploaded File(s) (De-dup)")
+            st.dataframe(final_df.head(10), use_container_width=False)
 
-    # Rename column name to phone_numbers
-    final_df = final_df.rename(columns={field_name: 'phone_number'})
+        # Text Box to copy and paste list of phone numbers
+        field_name = st.text_input('Specify Field Name to be renamed as phone_number (if different):')
 
-    # Normalize each phone number and replace value in the column
-    final_df['normalized_phone_number'] = [normalize_phone_number(num) for num in final_df['phone_number']]
+        # Rename column name to phone_numbers
+        final_df = final_df.rename(columns={field_name: 'phone_number'})
 
-    #  Validate phone number using phonenumbers library
-    st.text('Normalized and Validated Records (De-dup)')
-    final_df['valid'] = [validate_phone_number(num, default_region=selected_code) for num in final_df['normalized_phone_number']]
-    final_df
+        # Normalize each phone number and replace value in the column
+        final_df['normalized_phone_number'] = [normalize_phone_number(num) for num in final_df['phone_number']]
 
-    # Convert DataFrame to CSV
-    csv = final_df.to_csv(index=False).encode('utf-8')
+        #  Validate phone number using phonenumbers library
+        st.text('Normalized and Validated Records (De-dup)')
+        final_df['valid'] = [validate_phone_number(num, default_region=selected_code) for num in final_df['normalized_phone_number']]
+        st.dataframe(final_df)
 
-    # Download button
-    st.download_button(
-        label="📥 Download CSV",
-        data=csv,
-        file_name='output_data.csv',
-        mime='text/csv'
-    )
+        # Convert DataFrame to CSV
+        csv = final_df.to_csv(index=False).encode('utf-8')
 
-    st.header("Valid vs Invalid Status Visualization")
+        # Download button
+        st.download_button(
+            label="📥 Download CSV",
+            data=csv,
+            file_name='output_data.csv',
+            mime='text/csv'
+        )
 
-    # Value counts
-    value_counts = final_df['valid'].value_counts(dropna=False)
-    labels = value_counts.index
-    sizes = value_counts.values
-    total = sum(sizes)
+        st.header("Valid vs Invalid Status Visualization")
 
-    # Pie chart
-    fig, ax = plt.subplots(figsize=(3, 3))
-    colors = ['green' if val == 'valid' else 'red' for val in labels]
-    ax.pie(
-        sizes,
-        labels=labels,
-        autopct=make_autopct(sizes),
-        startangle=90,
-        colors=colors,
-        textprops={'fontsize': 8})
+        # Value counts
+        value_counts = final_df['valid'].value_counts(dropna=False)
+        labels = value_counts.index
+        sizes = value_counts.values
+        total = sum(sizes)
 
-    # Equal aspect ratio ensures pie is circular
-    ax.axis('equal')
+        # Pie chart
+        fig, ax = plt.subplots(figsize=(3, 3))
+        colors = ['green' if val == 'valid' else 'red' for val in labels]
+        ax.pie(
+            sizes,
+            labels=labels,
+            autopct=make_autopct(sizes),
+            startangle=90,
+            colors=colors,
+            textprops={'fontsize': 8})
 
-    plt.tight_layout()  # Trim whitespace
+        # Equal aspect ratio ensures pie is circular
+        ax.axis('equal')
 
-    # Layout in narrow column
-    col1, col2, _ = st.columns([2, 1, 1])  # Left-aligned smaller box
-    with col1:
-        st.pyplot(fig)
+        plt.tight_layout()  # Trim whitespace
+
+        # Layout in narrow column
+        col1, col2, _ = st.columns([2, 1, 1])  # Left-aligned smaller box
+        with col1:
+            st.pyplot(fig)
+
+except Exception as e:
+    st.error(f"⚠️ Please enter the fieldname to be used for validation.")
+    
+    # Optional: Show technical details
+    with st.expander("Show details"):
+        st.exception(e)
