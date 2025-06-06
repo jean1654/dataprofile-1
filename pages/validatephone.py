@@ -46,7 +46,15 @@ def validate_phone_number(phone_number, default_region='US'):
         return 'invalid'
 
 def normalize_visualize(final_df):
-        # Normalize each phone number and replace value in the column
+
+    # Custom function for count + percentage
+    def make_autopct(sizes):
+        def autopct(pct):
+            count = int(round(pct * total / 100.0))
+            return f'{count} ({pct:.1f}%)'
+        return autopct
+
+    # Normalize each phone number and replace value in the column
     final_df['normalized_phone_number'] = [normalize_phone_number(num) for num in final_df['phone_number']]
 
     #  Validate phone number using phonenumbers library
@@ -94,13 +102,6 @@ def normalize_visualize(final_df):
     col1, col2, _ = st.columns([2, 1, 1])  # Left-aligned smaller box
     with col1:
         st.pyplot(fig)
-
-# Custom function for count + percentage
-def make_autopct(sizes):
-    def autopct(pct):
-        count = int(round(pct * total / 100.0))
-        return f'{count} ({pct:.1f}%)'
-    return autopct
 
 # Get supported region codes from phonenumbers
 region_codes = sorted(phonenumbers.SUPPORTED_REGIONS)
