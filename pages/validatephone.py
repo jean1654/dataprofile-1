@@ -45,47 +45,8 @@ def validate_phone_number(phone_number, default_region='US'):
         # return original phone number
         return 'invalid'
 
-# Custom function for count + percentage
-def make_autopct(sizes):
-    def autopct(pct):
-        count = int(round(pct * total / 100.0))
-        return f'{count} ({pct:.1f}%)'
-    return autopct
-
-# Get supported region codes from phonenumbers
-region_codes = sorted(phonenumbers.SUPPORTED_REGIONS)
-
-# Map codes to full country names
-region_names = []
-code_to_name = {}
-
-for code in region_codes:
-    country = pycountry.countries.get(alpha_2=code)
-    name = country.name if country else "Unknown"
-    display = f"{name} ({code})"
-    region_names.append(display)
-    code_to_name[display] = code  # mapping display to code
-
-# Streamlit dropdown
-st.markdown(""" ### 🌍 Choose a Region """)
-selected_region = st.selectbox("Select a region before proceeding (default: 'US')", region_names)
-
-# Show selected region and code
-st.write(f"You selected: {selected_region}")
-selected_code = code_to_name[selected_region]
-
-st.markdown(""" ### 📞 Input Phone Numbers """)
-field_name = st.text_input('Manually enter Phone Numbers (separated with commas)')
-# Split by comma and strip whitespace
-phone_list = [s.strip() for s in field_name.split(',')]
-
-if field_name:
-    df = pd.DataFrame(phone_list, columns=['phone_number'])
-
-    # Remove duplicated records
-    final_df = df.drop_duplicates()
-
-    # Normalize each phone number and replace value in the column
+def normalize_visualize(final_df):
+        # Normalize each phone number and replace value in the column
     final_df['normalized_phone_number'] = [normalize_phone_number(num) for num in final_df['phone_number']]
 
     #  Validate phone number using phonenumbers library
@@ -133,6 +94,48 @@ if field_name:
     col1, col2, _ = st.columns([2, 1, 1])  # Left-aligned smaller box
     with col1:
         st.pyplot(fig)
+
+# Custom function for count + percentage
+def make_autopct(sizes):
+    def autopct(pct):
+        count = int(round(pct * total / 100.0))
+        return f'{count} ({pct:.1f}%)'
+    return autopct
+
+# Get supported region codes from phonenumbers
+region_codes = sorted(phonenumbers.SUPPORTED_REGIONS)
+
+# Map codes to full country names
+region_names = []
+code_to_name = {}
+
+for code in region_codes:
+    country = pycountry.countries.get(alpha_2=code)
+    name = country.name if country else "Unknown"
+    display = f"{name} ({code})"
+    region_names.append(display)
+    code_to_name[display] = code  # mapping display to code
+
+# Streamlit dropdown
+st.markdown(""" ### 🌍 Choose a Region """)
+selected_region = st.selectbox("Select a region before proceeding (default: 'US')", region_names)
+
+# Show selected region and code
+st.write(f"You selected: {selected_region}")
+selected_code = code_to_name[selected_region]
+
+st.markdown(""" ### 📞 Input Phone Numbers """)
+field_name = st.text_input('Manually enter Phone Numbers (separated with commas)')
+# Split by comma and strip whitespace
+phone_list = [s.strip() for s in field_name.split(',')]
+
+if field_name:
+    df = pd.DataFrame(phone_list, columns=['phone_number'])
+
+    # Remove duplicated records
+    final_df = df.drop_duplicates()
+
+    normalize_visualize(final_df)
 
 st.markdown(""" ### 📂 CSV Upload """)
 st.write('Note: You can upload multi-part datasets, but ensure all parts use the same schema to merge them correctly.')
